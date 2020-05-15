@@ -7,7 +7,7 @@
 
 using namespace std;
 
-void* function(void* arg);
+void* fooo(void* arg);
 
 int main(int argc, char** argv, char** env) {
     //check input argument
@@ -40,7 +40,7 @@ int main(int argc, char** argv, char** env) {
 
     //creating threads
     for(int i = 0; i < N; i++) {
-        int temp = pthread_create(&thread[i], &attr, function, (void*) &arg[i]);
+        int temp = pthread_create(&thread[i], &attr, fooo, (void*) &arg[i]);
 
         if(temp != 0) {
             cout << "Creating thread " << i << " failed!" << endl;
@@ -64,7 +64,7 @@ int main(int argc, char** argv, char** env) {
     return 0;
 }
 
-void* function(void* arg) {
+void* fooo(void* arg) {
     int ID;
 
     ID = *((int*) arg);
