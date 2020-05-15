@@ -18,7 +18,7 @@ typedef struct ARG {
     pthread_mutex_t *MUTEX;
 } ARG;
 
-void* function(void *arg);
+void* fooo(void *arg);
 
 int main(int argc, char **argv, char **env) {
     //timer
@@ -78,7 +78,7 @@ int main(int argc, char **argv, char **env) {
         ARGUMENTS[i].ID = i; //ID of each thread
         ARGUMENTS[i].PART = N / NUMBER; //number of members for each thread to sum
         ARGUMENTS[i].MUTEX = &mutex; //mutex which will help to avoid collisions
-        int temp = pthread_create(&thread[i], &attr, function, (void*) &ARGUMENTS[i]);
+        int temp = pthread_create(&thread[i], &attr, fooo, (void*) &ARGUMENTS[i]);
 
         if(temp != 0) {
             cout << "Creating thread " << i << " failed!" << endl;
@@ -121,7 +121,7 @@ int main(int argc, char **argv, char **env) {
     return 0;
 }
 
-void* function(void *arg) {
+void* fooo(void *arg) {
     //timer
     struct timespec BEGIN, END; //-lrt key is needed -> time_t tv_sec and long tv_nsec
     double TIMER;
