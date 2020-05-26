@@ -2,6 +2,6 @@
 
 ARG=30
 
-g++ 1thread.cpp -o out -lpthread
+g++ task1.cpp -o out -lpthread
 ./out $ARG
 rm out

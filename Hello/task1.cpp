@@ -7,9 +7,9 @@
 
 using namespace std;
 
-void* fooo(void* arg);
+void * fooo(void *arg);
 
-int main(int argc, char** argv, char** env) {
+int main(int argc, char **argv, char **env) {
     //check input argument
     if(argc != 2) {
         cout << "Give me number of threads!\n";
@@ -24,29 +24,36 @@ int main(int argc, char** argv, char** env) {
     }
 
     int N = atoi(argv[1]);
-    int* arg = (int*) malloc(sizeof(int) * N);
+    int *arg = new int[N];
 
     for(int i = 0; i < N; i++) {
         arg[i] = i;
     }
 
-    pthread_t* thread = (pthread_t*) malloc(sizeof(pthread_t) * N);
-    pthread_attr_t attr;
+    //pointers to threads
+    pthread_t *thread = new pthread_t[N];
 
     //initialize and set the thread attributes
+    //they could be not initialized
+    //in pthread_create (&attr) -> (NULL)
+    pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
     pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
 
+    cout << "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n";
+
     //creating threads
     for(int i = 0; i < N; i++) {
-        int temp = pthread_create(&thread[i], &attr, fooo, (void*) &arg[i]);
+        int temp = pthread_create(&thread[i], &attr, fooo, (void *) &arg[i]);
 
         if(temp != 0) {
             cout << "Creating thread " << i << " failed!" << endl;
             return 1;
         }
     }
+
+    pthread_attr_destroy(&attr);
 
     //joining threads
     for(int i = 0; i < N; i++) {
@@ -58,18 +65,20 @@ int main(int argc, char** argv, char** env) {
         }
     }
 
-    free(arg);
-    free(thread);
+    cout << "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n";
+
+    delete[] arg;
+    delete[] thread;
 
     return 0;
 }
 
-void* fooo(void* arg) {
+void * fooo(void *arg) {
     int ID;
 
-    ID = *((int*) arg);
+    ID = *((int *) arg);
 
-    printf("Hello from thread %02d!\n", ID);
+    printf("░░ Hello from thread %02d!\n", ID);
 
     //string line = "hello from thread " + to_string(ID) + '\n'; //can't see to_string
     //cout << line;

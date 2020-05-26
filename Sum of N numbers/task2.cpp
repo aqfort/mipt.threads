@@ -18,7 +18,7 @@ typedef struct ARG {
     pthread_mutex_t *MUTEX;
 } ARG;
 
-void* fooo(void *arg);
+void * fooo(void *arg);
 
 int main(int argc, char **argv, char **env) {
     //timer
@@ -51,20 +51,22 @@ int main(int argc, char **argv, char **env) {
     long N = atol(argv[2]);
 
     //ID = [0, 1, 2, ..., NUMBER - 1]
-    int *ID = (int*) malloc(sizeof(int) * NUMBER);
+    int *ID = new int[NUMBER];
     for(int i = 0; i < NUMBER; i++) {
         ID[i] = i;
     }
 
-    pthread_t *thread = (pthread_t*) malloc(sizeof(pthread_t) * NUMBER);
-    pthread_attr_t attr;
+    pthread_t *thread = new pthread_t[NUMBER];
 
     //initialize and set the thread attributes
+    //they could be not initialized
+    //in pthread_create (&attr) -> (NULL)
+    pthread_attr_t attr;
     pthread_attr_init(&attr);
     pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE);
     pthread_attr_setscope(&attr, PTHREAD_SCOPE_SYSTEM);
 
-    ARG *ARGUMENTS = (ARG*) malloc(sizeof(ARG) * NUMBER); //arguments which sent to each thread
+    ARG *ARGUMENTS = new ARG[NUMBER]; //arguments which sent to each thread
 
     for(long i = N - (N % NUMBER) + 1; i <= N; i++) { //sum of the rest of members
         RESULT += i;
@@ -78,13 +80,17 @@ int main(int argc, char **argv, char **env) {
         ARGUMENTS[i].ID = i; //ID of each thread
         ARGUMENTS[i].PART = N / NUMBER; //number of members for each thread to sum
         ARGUMENTS[i].MUTEX = &mutex; //mutex which will help to avoid collisions
-        int temp = pthread_create(&thread[i], &attr, fooo, (void*) &ARGUMENTS[i]);
+        int temp = pthread_create(&thread[i], &attr, fooo, (void *) &ARGUMENTS[i]);
 
         if(temp != 0) {
             cout << "Creating thread " << i << " failed!" << endl;
             return 1;
         }
     }
+
+    delete[] ARGUMENTS;
+
+    pthread_attr_destroy(&attr);
 
     //joining threads
     for(int i = 0; i < NUMBER; i++) {
@@ -115,20 +121,20 @@ int main(int argc, char **argv, char **env) {
     cout << "░░ Sum of " << N << " numbers equals to " << RESULT << "\n";
     cout << "░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░\n";
 
-    free(ID);
-    free(thread);
+    delete[] ID;
+    delete[] thread;
 
     return 0;
 }
 
-void* fooo(void *arg) {
+void * fooo(void *arg) {
     //timer
     struct timespec BEGIN, END; //-lrt key is needed -> time_t tv_sec and long tv_nsec
     double TIMER;
 
     clock_gettime(CLOCK_REALTIME, &BEGIN);
 
-    ARG *ARGUMENTS = (ARG*) arg;
+    ARG *ARGUMENTS = (ARG *) arg;
 
     long LOCAL_RESULT = 0;
 
